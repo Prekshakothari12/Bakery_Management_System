@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BakeFlow &mdash; Bakery Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ════════════════════ LOGIN ════════════════════ -->
+<div id="login-screen" class="login-screen">
+  <div class="login-bg-pattern"></div>
+  <div class="login-container">
+
+    <div class="login-brand">
+      <div class="brand-emblem">B</div>
+      <h1 class="brand-name">BakeFlow</h1>
+      <p class="brand-tagline">Bakery Management System</p>
+    </div>
+
+    <div class="login-card">
+      <h2 class="login-title">Sign In</h2>
+
+      <div class="role-selector">
+        <button class="role-btn active" data-role="customer" onclick="selectRole('customer',this)">
+          <span class="role-icon">&#9786;</span>
+          <span>Customer</span>
+        </button>
+        <button class="role-btn" data-role="admin" onclick="selectRole('admin',this)">
+          <span class="role-icon">&#9670;</span>
+          <span>Admin</span>
+        </button>
+        <button class="role-btn" data-role="employee" onclick="selectRole('employee',this)">
+          <span class="role-icon">&#9737;</span>
+          <span>Employee</span>
+        </button>
+      </div>
+
+      <!-- Demo Credentials Display -->
+      <div class="demo-credentials">
+        <div class="demo-cred-item active" id="cred-customer">anita / Anita123 <span style="font-size: 11px; color: #888; margin-left: 4px;">• Anita Sharma</span></div>
+        <div class="demo-cred-item" id="cred-admin">admin / Admin123 <span style="font-size: 11px; color: #888; margin-left: 4px;">• Administrator</span></div>
+        <div class="demo-cred-item" id="cred-employee">Ravi Kumar / Ravi@123 <span style="font-size: 11px; color: #888; margin-left: 4px;">• Baker</span></div>
+      </div>
+
+      <div class="login-form" id="login-form">
+        <!-- Username Field - same for all roles -->
+        <div class="form-group">
+          <label for="login-username">Username</label>
+          <input id="login-username" type="text" placeholder="Enter your username" autocomplete="off"/>
+          <span class="form-error" id="username-error"></span>
+        </div>
+
+        <!-- Password Field - same for all roles -->
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input id="login-password" type="password" placeholder="Enter your password"/>
+          <span class="form-error" id="password-error"></span>
+        </div>
+
+        <!-- Error Message -->
+        <div id="login-error" class="login-error hidden"></div>
+
+        <!-- Sign In Button -->
+        <button class="login-btn" onclick="doLogin()">Sign In &rarr;</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════ MAIN APP ════════════════════ -->
+<div id="app" class="app hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-emblem-sm">B</div>
+      <div>
+        <div class="sidebar-brand-name">BakeFlow</div>
+        <div class="sidebar-brand-sub">Management</div>
+      </div>
+    </div>
+
+    <div class="user-info-sidebar">
+      <div class="user-avatar" id="sidebar-avatar">A</div>
+      <div>
+        <div class="user-name-sidebar" id="sidebar-username">&mdash;</div>
+        <div class="user-role-badge"   id="sidebar-role-badge">&mdash;</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+    <button class="logout-btn" onclick="doLogout()">&#8592; Sign Out</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2 class="page-title" id="page-title">Dashboard</h2>
+        <div class="breadcrumb" id="breadcrumb">BakeFlow / Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbar-date"></div>
+        <div class="topbar-user" id="topbar-user"></div>
+      </div>
+    </header>
+
+    <!-- ═══════ ADMIN DASHBOARD ═══════ -->
+    <section class="section" id="sec-dashboard">
+      <div class="stat-grid">
+        <div class="stat-card accent-gold">
+          <span class="stat-icon">&#9654;</span>
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value" id="stat-revenue">&mdash;</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card accent-green">
+          <span class="stat-icon">&#9700;</span>
+          <div class="stat-label">Orders</div>
+          <div class="stat-value" id="stat-orders">&mdash;</div>
+          <div class="stat-sub" id="stat-pending-sub">&mdash; pending</div>
+        </div>
+        <div class="stat-card accent-blue">
+          <span class="stat-icon">&#9632;</span>
+          <div class="stat-label">Products</div>
+          <div class="stat-value" id="stat-products">&mdash;</div>
+          <div class="stat-sub">Active</div>
+        </div>
+        <div class="stat-card accent-red">
+          <span class="stat-icon">&#9651;</span>
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-value" id="stat-lowstock">&mdash;</div>
+          <div class="stat-sub">Ingredients</div>
+        </div>
+        <div class="stat-card accent-purple">
+          <span class="stat-icon">&#9786;</span>
+          <div class="stat-label">Customers</div>
+          <div class="stat-value" id="stat-customers">&mdash;</div>
+          <div class="stat-sub">Registered</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Recent Orders</h3>
+            <button class="btn btn-sm btn-ghost" onclick="navigateTo('orders')">View All</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Order</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody id="dash-recent-orders"></tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Top Products</h3>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Product</th><th>Sold</th><th>Revenue</th></tr></thead>
+            <tbody id="dash-top-products"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dashboard-grid gap-section">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Low Stock Ingredients</h3>
+            <button class="btn btn-sm btn-ghost" onclick="navigateTo('ingredients')">Manage</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Ingredient</th><th>In Stock</th><th>Min Level</th><th>Status</th></tr></thead>
+            <tbody id="dash-low-stock"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ PRODUCTS ═══════ -->
+    <section class="section hidden" id="sec-products">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="product-search" placeholder="Search products&hellip;" oninput="filterProducts()"/>
+          <select class="filter-select" id="product-cat-filter" onchange="filterProducts()">
+            <option value="">All Categories</option>
+            <option>Bread</option><option>Cookie</option><option>Cake</option>
+            <option>Muffin</option><option>Pastry</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="add-product-btn" onclick="openAddProductForm()">+ Add Product</button>
+      </div>
+
+      <div class="slide-panel hidden" id="product-form-panel">
+        <h3 class="panel-form-title">Add New Product</h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Product Name</label><input id="pf-name" placeholder="e.g. Butter Bun"/></div>
+          <div class="form-group"><label>Production Cost (&#8377;)</label><input id="pf-cost" type="number" placeholder="0"/></div>
+          <div class="form-group"><label>Selling Price (&#8377;)</label><input id="pf-price" type="number" placeholder="0"/></div>
+          <div class="form-group"><label>Shelf Life (days)</label><input id="pf-shelf" type="number" placeholder="3"/></div>
+          <div class="form-group"><label>Unit Weight</label><input id="pf-wt" placeholder="100g" autocomplete="off"/></div>
+          <div class="form-group"><label>Quantity Baked (units)</label><input id="pf-qty" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="0"/></div>
+          <div class="form-group"><label>Category</label>
+            <select id="pf-cat">
+              <option>Bread</option><option>Cookie</option><option>Cake</option>
+              <option>Muffin</option><option>Pastry</option>
+            </select>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <h4 style="margin-bottom:10px">Recipe (optional)</h4>
+        <div id="product-recipe-rows"></div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="addRecipeRow('product-recipe-rows')">+ Add Ingredient</button>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="addProduct()">Save Product</button>
+          <button class="btn btn-ghost"   onclick="closeAddProductForm()">Cancel</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr>
+            <th>ID</th><th>Name</th><th>Category</th><th>Weight</th>
+            <th>Cost (&#8377;)</th><th>Price (&#8377;)</th><th>Margin</th><th>Shelf</th>
+            <!-- 5a: Added "In Stock" column -->
+            <th>In Stock</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="products-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ ORDERS (Admin) ═══════ -->
+    <section class="section hidden" id="sec-orders">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="order-search" placeholder="Search orders&hellip;" oninput="filterOrders()"/>
+          <select class="filter-select" id="order-status-filter" onchange="filterOrders()">
+            <option value="">All Statuses</option>
+            <option>Pending</option><option>Processing</option><option>Baking</option>
+            <option>Ready</option><option>Shipped</option><option>Delivered</option>
+          </select>
+          <select class="filter-select" id="order-type-filter" onchange="filterOrders()">
+            <option value="">All Types</option>
+            <option value="Online">Online</option>
+            <option value="Offline">Offline</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr>
+            <th>Order ID</th><th>Date</th><th>Customer</th><th>Product</th>
+            <th>Qty</th><th>Total (&#8377;)</th><th>Type</th><th>Status</th><th>Update</th>
+          </tr></thead>
+          <tbody id="orders-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ CUSTOMERS (Admin) ═══════ -->
+    <section class="section hidden" id="sec-customers">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="cust-search" placeholder="Search customers&hellip;" oninput="filterCustomers()"/>
+        </div>
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Orders</th></tr></thead>
+          <tbody id="customers-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ INGREDIENTS (Admin + Employee) ═══════ -->
+    <section class="section hidden" id="sec-ingredients">
+      <div id="low-stock-banner" class="alert-banner hidden">
+        &#9651;&nbsp; One or more ingredients are below minimum stock level. Review and reorder.
+      </div>
+
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="ing-search" placeholder="Search ingredients&hellip;" oninput="filterIngredients()"/>
+          <select class="filter-select" id="ing-status-filter" onchange="filterIngredients()">
+            <option value="">All Stock Levels</option>
+            <option value="Adequate">Adequate</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+        </div>
+        <!-- 5d: Add Ingredient button -->
+        <button class="btn btn-primary" onclick="openAddIngredientForm()">+ Add Ingredient</button>
+        <button class="btn btn-ghost" onclick="togglePanel('restock-workflow-panel')">&#9662; Restock Orders</button>
+      </div>
+
+      <!-- 5d: Add Ingredient form panel -->
+      <div id="ing-add-panel" class="slide-panel hidden" style="margin-bottom:16px">
+        <h3 class="panel-form-title">Add New Ingredient</h3>
+        <div class="form-grid">
+          <div class="form-group"><label>Name <span style="color:var(--danger)">*</span></label><input id="ing-f-name" placeholder="e.g. Vanilla Essence"/></div>
+          <div class="form-group"><label>Qty in Stock</label><input id="ing-f-qty" type="number" min="0" placeholder="0"/></div>
+          <div class="form-group"><label>Min Stock Level</label><input id="ing-f-min" type="number" min="0" placeholder="0"/></div>
+          <div class="form-group"><label>Unit (g / ml / pcs)</label><input id="ing-f-unit" placeholder="g"/></div>
+          <div class="form-group"><label>Unit Price (&#8377;)</label><input id="ing-f-price" type="number" min="0" placeholder="0"/></div>
+          <div class="form-group"><label>Supplier</label><select id="ing-f-supplier" onchange="toggleIngredientSupplierFields(this.value)"><option value="">-- Select supplier --</option><option value="__new__">+ Add new supplier</option></select></div>
+        </div>
+        <div id="ing-new-supplier-fields" class="form-grid hidden" style="margin-top:12px">
+          <div class="form-group"><label>Supplier Name</label><input id="ing-new-supplier-name" placeholder="e.g. Fresh Farms"/></div>
+          <div class="form-group"><label>Phone Number</label><input id="ing-new-supplier-phone" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="10-digit number"/></div>
+          <div class="form-group"><label>Address</label><input id="ing-new-supplier-address" placeholder="e.g. Pune"/></div>
+          <div class="form-group"><label>Payment Terms</label><input id="ing-new-supplier-terms" placeholder="e.g. Net 30"/></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="addIngredient()">Save Ingredient</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('ing-add-panel').classList.add('hidden')">Cancel</button>
+        </div>
+      </div>
+
+      <div class="restock-workflow-panel hidden" id="restock-workflow-panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Restock Orders</h3>
+          <button class="btn btn-sm btn-ghost" onclick="togglePanel('restock-workflow-panel')">Close</button>
+        </div>
+        <div id="restock-orders-list" style="padding:14px;display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;"></div>
+      </div>
+
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr>
+            <th>ID</th><th>Ingredient</th><th>In Stock</th><th>Min Level</th>
+            <th>Unit Price (&#8377;)</th><th>Supplier</th><th>Status</th><th>Action</th>
+          </tr></thead>
+          <tbody id="ingredients-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ EMPLOYEES (Admin) ═══════ -->
+    <section class="section hidden" id="sec-employees">
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr>
+            <th>ID</th><th>Name</th><th>Role</th><th>Salary (&#8377;)</th><th>Level</th><th>Joined</th><th>Experience</th>
+          </tr></thead>
+          <tbody id="employees-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ RECIPES (Admin + Employee) ═══════ -->
+    <section class="section hidden" id="sec-recipes">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="recipe-search" placeholder="Search recipes&hellip;" oninput="filterRecipes()"/>
+          <select class="filter-select" id="recipe-cat-filter" onchange="filterRecipes()">
+            <option value="">All Categories</option>
+            <option>Bread</option><option>Cookie</option><option>Cake</option>
+            <option>Muffin</option><option>Pastry</option>
+          </select>
+        </div>
+      </div>
+      <div class="recipe-grid" id="recipe-grid"></div>
+    </section>
+
+    <!-- ═══════ IN-STORE ORDER (Admin + Employee) ═══════ -->
+    <section class="section hidden" id="sec-shop-order">
+      <div class="order-layout">
+        <div class="product-catalog" id="shop-product-catalog"></div>
+
+        <div class="order-sidebar-panel">
+          <h3 class="panel-form-title">In-Store Order</h3>
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">Place order for a walk-in or existing customer.</p>
+
+          <!-- Choose existing or new customer -->
+          <div class="form-group" style="margin-bottom:8px">
+            <label>Customer Type</label>
+            <select id="shop-cust-type" onchange="toggleShopCustomerType()">
+              <option value="existing">Existing Customer</option>
+              <option value="walkin">Walk-in (New Customer)</option>
+            </select>
+          </div>
+
+          <div id="shop-existing-cust">
+            <div class="form-group">
+              <label>Select Customer</label>
+              <select id="shop-customer-select">
+                <option value="">-- Select --</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="shop-walkin-cust" class="walkin-form hidden">
+            <div class="form-group">
+              <label>Customer Name <span style="color:var(--danger)">*</span></label>
+              <input id="walkin-name" placeholder="Full name" autocomplete="off"/>
+            </div>
+            <div class="form-group" style="margin-top:8px">
+              <label>Phone (optional)</label>
+              <input id="walkin-phone" placeholder="10-digit number" maxlength="10"/>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="form-group">
+            <label>Product</label>
+            <select id="shop-product-select" onchange="updateShopSummary()">
+              <option value="">-- Choose product --</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top:10px">
+            <label>Quantity</label>
+            <input id="shop-qty" type="number" min="1" value="1" oninput="updateShopSummary()"/>
+          </div>
+
+          <div class="order-summary-box">
+            <div class="order-summary-row"><span>Product</span><span id="shop-os-product">&mdash;</span></div>
+            <div class="order-summary-row"><span>Unit Price</span><span id="shop-os-price">&mdash;</span></div>
+            <div class="order-summary-row"><span>Qty</span><span id="shop-os-qty">&mdash;</span></div>
+            <div class="order-summary-row order-summary-total"><span>Total</span><span id="shop-os-total">&mdash;</span></div>
+          </div>
+
+          <!-- Recipe Display -->
+          <div id="shop-recipe-display" class="hidden" style="margin-top:14px;padding:12px;background:var(--surface-2);border-radius:6px;border-left:3px solid var(--caramel)">
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--caramel)">Recipe Items</div>
+            <div id="shop-recipe-items" style="font-size:12px"></div>
+          </div>
+
+          <!-- 5c: Changed button to "Add to Cart" -->
+          <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="addToShopCart()">
+            Add to Cart
+          </button>
+
+          <!-- 5c: Cart section for in-store orders -->
+          <div id="shop-cart-section" class="hidden" style="margin-top:20px">
+            <h4 style="margin-bottom:10px">Order Summary</h4>
+            <div id="shop-cart-items"></div>
+            <button class="btn btn-primary" style="margin-top:14px;width:100%" onclick="placeShopOrder()">Confirm Order</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CUSTOMER: MY ORDERS ═══════ -->
+    <section class="section hidden" id="sec-my-orders">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <span style="font-size:13px;color:var(--text-muted);">Your order history and live status</span>
+        </div>
+        <button class="btn btn-primary" onclick="navigateTo('place-order')">+ New Order</button>
+      </div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr>
+            <th>Order ID</th><th>Date</th><th>Product</th><th>Qty</th><th>Total (&#8377;)</th><th>Status</th>
+          </tr></thead>
+          <tbody id="my-orders-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ CUSTOMER: PLACE ORDER ═══════ -->
+    <section class="section hidden" id="sec-place-order">
+      <div class="order-layout">
+        <div class="product-catalog" id="product-catalog"></div>
+        <div class="order-sidebar-panel">
+          <h3 class="panel-form-title">Place an Order</h3>
+
+          <div class="form-group">
+            <label>Select Product</label>
+            <select id="order-product-select" onchange="updateOrderSummary()">
+              <option value="">-- Choose a product --</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top:10px">
+            <label>Quantity</label>
+            <input id="order-qty" type="number" min="1" value="1" oninput="updateOrderSummary()"/>
+          </div>
+          <div class="order-summary-box">
+            <div class="order-summary-row"><span>Product</span><span id="os-product">&mdash;</span></div>
+            <div class="order-summary-row"><span>Unit Price</span><span id="os-price">&mdash;</span></div>
+            <div class="order-summary-row"><span>Qty</span><span id="os-qty">&mdash;</span></div>
+            <div class="order-summary-row order-summary-total"><span>Total</span><span id="os-total">&mdash;</span></div>
+            <div id="os-stock-warn" style="color:var(--danger);font-size:13px;display:none"></div>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="addToCart()">Add to Cart</button>
+
+          <div id="order-cart-section" class="hidden" style="margin-top:20px">
+            <h4 style="margin-bottom:10px">Your Order</h4>
+            <div id="order-cart-items"></div>
+            <div style="margin-top:10px;padding:10px;background:var(--surface-2);border-radius:6px;font-size:12px;color:var(--text-secondary)">
+              &#8505; Orders are confirmed once payment is received at the bakery.
+            </div>
+            <button class="btn btn-primary" style="margin-top:14px;width:100%" onclick="placeOrder()">Confirm Order</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ CUSTOMER: MENU ═══════ -->
+    <section class="section hidden" id="sec-browse-products">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="menu-search" placeholder="Search menu&hellip;" oninput="filterMenu()"/>
+          <select class="filter-select" id="menu-cat-filter" onchange="filterMenu()">
+            <option value="">All Categories</option>
+            <option>Bread</option><option>Cookie</option><option>Cake</option>
+            <option>Muffin</option><option>Pastry</option>
+          </select>
+        </div>
+      </div>
+      <div class="product-catalog-full" id="browse-catalog"></div>
+    </section>
+
+    <!-- ═══════ CUSTOMER: SUPPORT ═══════ -->
+    <section class="section hidden" id="sec-support">
+      <div class="support-layout">
+        <div class="support-card">
+          <span class="support-icon">&#9742;</span>
+          <h3>Call Us</h3>
+          <p class="support-detail">+91 98877 66554</p>
+          <p class="support-sub">Mon&ndash;Sat, 8 AM &ndash; 8 PM</p>
+        </div>
+        <div class="support-card">
+          <span class="support-icon">&#9993;</span>
+          <h3>Email</h3>
+          <p class="support-detail">hello@bakeflow.in</p>
+          <p class="support-sub">Reply within 24 hours</p>
+        </div>
+        <div class="support-card">
+          <span class="support-icon">&#9873;</span>
+          <h3>Visit Us</h3>
+          <p class="support-detail">Karve Nagar, Pune</p>
+          <p class="support-sub">Open daily, 7 AM &ndash; 9 PM</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><h3 class="panel-title">Send a Message</h3></div>
+        <div style="padding:22px;max-width:520px">
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Issue Type</label>
+            <select id="support-type">
+              <option>Order not delivered</option>
+              <option>Wrong item received</option>
+              <option>Payment issue</option>
+              <option>Product quality complaint</option>
+              <option>General enquiry</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Order ID (if applicable)</label>
+            <input id="support-orderid" placeholder="e.g. ORD001"/>
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Message</label>
+            <textarea id="support-msg" rows="4" style="width:100%;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;outline:none;background:var(--warm-white)" placeholder="Describe your issue&hellip;"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="submitSupport()">Send Message</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ EMPLOYEE DASHBOARD ═══════ -->
+    <section class="section hidden" id="sec-emp-dashboard">
+      <div class="emp-welcome">
+        <h2 id="emp-welcome-name">Welcome</h2>
+        <p id="emp-welcome-role"></p>
+      </div>
+      <div class="stat-grid mt-20">
+        <div class="stat-card accent-gold">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-value" id="emp-stat-orders">&mdash;</div>
+        </div>
+        <div class="stat-card accent-red">
+          <div class="stat-label">Low Stock</div>
+          <div class="stat-value" id="emp-stat-lowstock">&mdash;</div>
+        </div>
+        <div class="stat-card accent-blue">
+          <div class="stat-label">Active Products</div>
+          <div class="stat-value" id="emp-stat-products">&mdash;</div>
+        </div>
+        <div class="stat-card accent-green">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="emp-stat-pending">&mdash;</div>
+        </div>
+      </div>
+      <div class="panel mt-20">
+        <div class="panel-header">
+          <h3 class="panel-title">Recent Orders</h3>
+          <button class="btn btn-sm btn-primary" onclick="navigateTo('shop-order')">+ In-Store Order</button>
+        </div>
+        <table class="data-table">
+          <thead><tr>
+            <th>Order ID</th><th>Customer</th><th>Product</th><th>Qty</th><th>Date</th><th>Type</th><th>Status</th>
+          </tr></thead>
+          <tbody id="emp-orders-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══════ EMPLOYEE: INGREDIENTS ═══════ -->
+    <section class="section hidden" id="sec-emp-ingredients">
+      <div id="emp-low-stock-banner" class="alert-banner hidden">
+        &#9651;&nbsp; Some ingredients are below minimum stock level. Request restock.
+      </div>
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <input class="search-input" id="emp-ing-search" placeholder="Search ingredients&hellip;" oninput="filterEmpIngredients()"/>
+        </div>
+        <button class="btn btn-ghost" onclick="togglePanel('emp-restock-workflow-panel')">&#9662; Restock Orders</button>
+      </div>
+
+      <div class="restock-workflow-panel hidden" id="emp-restock-workflow-panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Restock Orders</h3>
+          <button class="btn btn-sm btn-ghost" onclick="togglePanel('emp-restock-workflow-panel')">Close</button>
+        </div>
+        <div id="emp-restock-orders-list" style="padding:14px;display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;"></div>
+      </div>
+
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr>
+            <th>ID</th><th>Ingredient</th><th>In Stock</th><th>Min Level</th>
+            <th>Unit Price (&#8377;)</th><th>Supplier</th><th>Status</th><th>Action</th>
+          </tr></thead>
+          <tbody id="emp-ingredients-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
+
+<!-- RESTOCK MODAL -->
+<div id="restock-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 class="modal-title">Restock Ingredient</h3>
+    <p id="restock-ing-name" style="color:var(--text-secondary);margin-bottom:14px;font-size:14px;"></p>
+    <div class="form-group">
+      <label>Quantity to Order</label>
+      <input id="restock-qty" type="number" min="1" placeholder="Enter quantity"/>
+    </div>
+    <div class="form-actions" style="margin-top:18px">
+      <button class="btn btn-primary" onclick="confirmRestock()">Place Restock Order</button>
+      <button class="btn btn-ghost"   onclick="closeModal('restock-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+<!-- EDIT PRODUCT MODAL -->
+<div id="edit-product-modal" class="modal-overlay hidden">
+  <div class="modal" style="min-width:360px">
+    <h3 class="modal-title">Edit Product</h3>
+    <input type="hidden" id="edit-prod-id"/>
+    <div class="form-group" style="margin-bottom:10px"><label>Product Name</label><input id="edit-prod-name"/></div>
+    <div class="form-group" style="margin-bottom:10px"><label>Selling Price (&#8377;)</label><input id="edit-prod-price" type="number"/></div>
+    <div class="form-group" style="margin-bottom:10px"><label>Category</label>
+      <select id="edit-prod-cat">
+        <option>Bread</option><option>Cookie</option><option>Cake</option><option>Muffin</option><option>Pastry</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-bottom:10px"><label>Current Stock (units)</label><div id="edit-prod-current-stock" style="padding:10px;background:var(--surface-2);border-radius:6px;font-weight:600;border:1px solid var(--border)">0</div></div>
+    <div class="form-group" style="margin-bottom:10px"><label>Add Quantity (units)</label><input id="edit-prod-add-qty" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Enter units to add"/></div>
+    <div class="divider"></div>
+    <h4 style="margin-bottom:10px">Recipe</h4>
+    <div id="edit-product-recipe-rows"></div>
+    <button class="btn btn-ghost btn-sm" type="button" onclick="addRecipeRow('edit-product-recipe-rows')">+ Add Ingredient</button>
+    <div class="form-actions" style="margin-top:16px">
+      <button class="btn btn-primary" onclick="saveEditProduct()">Save Changes</button>
+      <button class="btn btn-ghost" onclick="closeModal('edit-product-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD STOCK MODAL (Employee) -->
+<div id="addstock-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <h3 class="modal-title">Add Baked Stock</h3>
+    <input type="hidden" id="addstock-prod-id"/>
+    <p id="addstock-prod-name" style="color:var(--text-secondary);margin-bottom:14px;font-size:14px;"></p>
+    <div class="form-group" style="margin-bottom:10px">
+      <label>Current Stock (live)</label>
+      <div id="addstock-current-stock" style="padding:10px;background:var(--surface-2);border-radius:6px;font-weight:600;border:1px solid var(--border)">Loading...</div>
+    </div>
+    <div class="form-group">
+      <label>Units baked today</label>
+      <input id="addstock-qty" type="number" min="1" placeholder="e.g. 20"/>
+    </div>
+    <div class="form-actions" style="margin-top:18px">
+      <button class="btn btn-primary" onclick="confirmAddStock()">Add to Stock</button>
+      <button class="btn btn-ghost" onclick="closeModal('addstock-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
