@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Environment variables (contains secrets!)
+.env
+
+# Local runtime/log files
+port3000*.txt
+node-processes.txt
+
+# Windows batch files
+*.bat
+
+# Optional
+package-lock.json
