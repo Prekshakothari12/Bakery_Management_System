@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 
-# Environment variables (contains secrets!)
+# Environment variables 
 .env
 
 # Local runtime/log files
@@ -10,6 +10,9 @@ node-processes.txt
 
 # Windows batch files
 *.bat
+
+# Database files
+*.sql
 
 # Optional
 package-lock.json
